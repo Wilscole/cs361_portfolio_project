@@ -26,7 +26,7 @@ app.post('/exercises', (req, res) => {
 })
 app.post('/categories', (req, res) => {
 
-    budgets.createCategory(req.body.name, req.body.amount)
+    budgets.createCategory(req.body.budgetId, req.body.name, req.body.amount)
         .then(category => {
             res.status(201).json(category);
         })
@@ -37,11 +37,48 @@ app.post('/categories', (req, res) => {
 
 })
 
+app.post('/transaction', (req, res) => {
+
+    budgets.createTransaction(req.body.name, req.body.category, req.body.amount, req.body.date, req.body.budgetId)
+        .then(category => {
+            res.status(201).json(category);
+        })
+        .catch(error => {
+            console.error(error)
+            res.status(400).json({ Error: 'Request Failed' })
+        })
+
+})
+
+app.get('/transaction', (req, res) => {
+    let filter = {}
+    budgets.findTransaction(filter)
+        .then(transactions => {
+            res.json(transactions)
+        })
+        .catch(error => {
+            console.error(error)
+            res.status(400).json({ Error: 'Invalid Request' });
+        })
+})
+
 app.get('/exercises', (req, res) => {
     let filter = {}
     budgets.findBudget(filter)
         .then(budgets => {
             res.json(budgets)
+        })
+        .catch(error => {
+            console.error(error)
+            res.status(400).json({ Error: 'Invalid Request' });
+        })
+})
+
+app.get('/categories', (req, res) => {
+    let filter = {}
+    budgets.findCategory(filter)
+        .then(categories => {
+            res.json(categories)
         })
         .catch(error => {
             console.error(error)
@@ -94,8 +131,52 @@ app.put('/exercises/:_id', (req, res) => {
         });
 })
 
+app.put('/categories/:_id', (req, res) => {
+    budgets.replaceCategory(req.params._id, req.body.budgetId, req.body.name, req.body.amount)
+        .then(numUpdate => {
+            if (numUpdate === 1) {
+                res.json({ _id: req.params._id, budgetId: req.body.budgetId, name: req.body.name, amount: req.body.amount })
+            } else {
+                res.status(400).json({ Error: 'Invalid Request' })
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            res.status(400).json({ Error: 'Invalid Request' })
+        });
+})
+
 app.delete('/exercises/:_id', (req, res) => {
     budgets.deleteById(req.params._id)
+        .then(deletedCount => {
+            if (deletedCount === 1) {
+                res.status(204).send();
+            } else {
+                res.status(404).json({ Error: 'Document not found' });
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            res.send({ error: 'Request to delete a document failed' });
+        });
+});
+
+app.delete('/categories/:_id', (req, res) => {
+    budgets.deleteCatById(req.params._id)
+        .then(deletedCount => {
+            if (deletedCount === 1) {
+                res.status(204).send();
+            } else {
+                res.status(404).json({ Error: 'Document not found' });
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            res.send({ error: 'Request to delete a document failed' });
+        });
+});
+app.delete('/transaction/:_id', (req, res) => {
+    budgets.deleteTransById(req.params._id)
         .then(deletedCount => {
             if (deletedCount === 1) {
                 res.status(204).send();

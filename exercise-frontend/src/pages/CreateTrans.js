@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { Link } from 'react-router-dom';
+import CategorySelect from '../components/CategorySelect';
 
-
-export const CreateTransaction = () => {
-
+export const CreateTransaction = ({ budgetId }) => {
+    console.log(budgetId)
+    const [categories, setCategories] = useState([])
     const [name, setName] = useState('');
     const [amount, setAmount] = useState('');
     const [date, setDate] = useState('');
@@ -15,20 +16,35 @@ export const CreateTransaction = () => {
     const history = useHistory();
 
 
-    const hanldleChange = (name, amount, date) => {
+    const hanldleChange = (name, category, amount, date) => {
         if (name && amount && date) {
+            console.log('handling change', category)
             setBtn(false)
         } else {
             setBtn(true)
         }
     }
+    const bugetName = budgetId
+    const loadCategories = async () => {
+        const response = await fetch(`/categories`)      //is a promise     
+        const categoryData = await response.json();     // also a promise  
+        const newCategories = categoryData.filter(e => e.budgetId === bugetName)
+        console.log(newCategories)
+        setCategories(newCategories);
+    }
 
-    const addCategory = async () => {
-        const newCategory = { name, amount }
-        const response = await fetch('/exercises',
+
+    useEffect(() => {
+        loadCategories();
+    }, []);
+
+    const addTrans = async () => {
+        const newTrans = { name, category, amount, date, budgetId }
+        console.log('trans', newTrans)
+        const response = await fetch('/transaction',
             {
                 method: 'POST',
-                body: JSON.stringify(newCategory),
+                body: JSON.stringify(newTrans),
                 headers: {
                     'Content-Type': 'application/json',
                 }
@@ -58,14 +74,15 @@ export const CreateTransaction = () => {
                         id="name"
                         required /><br />
 
-                    <label for="name">Category</label> <br />
-                    <input
-                        type="text"
-                        placeholder="Category Name"
-                        value={name}
-                        onChange={e => { setName(e.target.value); hanldleChange(name, e.target.value, amount, date) }}
-                        id="name"
-                        required /><br />
+
+                    <label >Category</label> <br />
+                    <select value={category}
+                        onChange={e => { setCategory(e.target.value); hanldleChange(name, e.target.value, amount, date) }}
+                        id="cat"
+                        required>
+                        <option>--Select--</option>
+                        <CategorySelect categories={categories} />
+                    </select><br />
 
                     <label for="reps">Amount</label> <br />
                     <input
@@ -90,7 +107,7 @@ export const CreateTransaction = () => {
                         <button
                             disabled={btn}
                             type="submit"
-                            onClick={addCategory}
+                            onClick={addTrans}
                             id="submit"
                         >Create</button></label>
                 </fieldset>

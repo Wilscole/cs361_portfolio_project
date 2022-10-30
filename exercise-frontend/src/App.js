@@ -12,11 +12,15 @@ import FAQ from './pages/FAQ';
 import ViewBudgetPage from './pages/ViewExercisePage';
 import CreateCategory from './pages/CreateCategory';
 import CreateTransaction from './pages/CreateTrans';
-
+import EditCategory from './pages/EditCategory';
+import ViewCategoryPage from './pages/ViewCategoryPage';
 function App() {
   const [budgetToEdit, setBudgetToEdit] = useState([]);
   const [viewBudgets, setViewBudgets] = useState([])
   const [budgetId, setBudgetId] = useState([])
+  const [category, setCategory] = useState([])
+  const [categoryToEdit, setCategoryToEdit] = useState([])
+  const [cats, setCats] = useState([])
 
 
 
@@ -32,9 +36,13 @@ function App() {
           <Route path="/" exact> <HomePage setBudgetToEdit={setBudgetToEdit} setViewBudgets={setViewBudgets} /> </Route>
           <Route path="/add-budget"> <CreateBudgetPage /> </Route>
           <Route path="/edit-budget"><EditBudgetPage budgetToEdit={budgetToEdit} /></Route>
-          <Route path="/view-budget"><ViewBudgetPage viewBudgets={viewBudgets} setBudgetId={setBudgetId} /></Route>
+          <Route path="/view-budget"><ViewBudgetPage viewBudgets={viewBudgets} setBudgetId={setBudgetId} setCategoryToEdit={setCategoryToEdit} setCategory={setCategory} setCats={setCats} /></Route>
           <Route path="/add-category"><CreateCategory budgetId={budgetId} /></Route>
-          <Route path="/add-transaction"><CreateTransaction /></Route>
+          <Route path="/add-transaction"><CreateTransaction budgetId={budgetId} setCategoryToEdit={setCategoryToEdit} cats={cats} /></Route>
+          <Route path="/edit-category"><EditCategory categoryToEdit={categoryToEdit} /></Route>
+          <Route path="/view-category"><ViewCategoryPage category={category} /></Route>
+
+
 
           <Route path="/faq"> <FAQ /></Route>
           <Route path="/about"> <About /></Route>

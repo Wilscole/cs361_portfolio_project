@@ -3,11 +3,12 @@ import { useHistory } from "react-router-dom";
 import { Link } from 'react-router-dom';
 
 
-export const CreateCategory = ({ budgetId }) => {
-    console.log(budgetId)
-    const [name, setName] = useState('');
-    const [amount, setAmount] = useState('');
+export const EditCategory = ({ categoryToEdit }) => {
+    const [name, setName] = useState(categoryToEdit.name);
+    const [amount, setAmount] = useState(categoryToEdit.amount);
     const [btn, setBtn] = useState(true)
+    const budgetId = categoryToEdit.budgetId
+    console.log(budgetId)
 
 
     const history = useHistory();
@@ -21,23 +22,24 @@ export const CreateCategory = ({ budgetId }) => {
         }
     }
 
-    const addCategory = async () => {
-        const newCategory = { budgetId, name, amount }
-        const response = await fetch('/categories',
+    const EditCategory = async () => {
+        const editedCat = { budgetId, name, amount }
+        const response = await fetch(`/categories/${categoryToEdit._id}`,
             {
-                method: 'POST',
-                body: JSON.stringify(newCategory),
+                method: 'PUT',
+                body: JSON.stringify(editedCat),
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
-        if (response.status === 201) {
-            alert("Category added successfully!")
+        if (response.status === 200) {
+            alert("Budget edited successfully!")
         } else {
-            alert(`Failed to add category, status code = ${response.status}`)
+            alert(`Failed to edit budget, status code = ${response.status}`)
         }
-        history.push('/view-budget');
+        history.push('/');
     }
+
 
     return (
         <>
@@ -69,7 +71,7 @@ export const CreateCategory = ({ budgetId }) => {
                         <button
                             disabled={btn}
                             type="submit"
-                            onClick={addCategory}
+                            onClick={EditCategory}
                             id="submit"
                         >Create</button></label>
                 </fieldset>
@@ -82,4 +84,4 @@ export const CreateCategory = ({ budgetId }) => {
 }
 
 
-export default CreateCategory;
+export default EditCategory;
